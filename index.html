@@ -1,0 +1,119 @@
+<html>
+<head>
+	<meta name="viewport" content="initial-scale=1, maximum-scale=1, width=device-width, user-scalable=no">
+	<title>Guerap Chat</title>
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+	<div id="login">
+
+			<span class="fontawesome-user"></span><input type="text" required value="Usuário" onBlur="if(this.value=='')this.value='Usuário'" onFocus="if(this.value=='Usuário')this.value='' " id="name">
+			<span class="fontawesome-lock"></span><input type="password" required value="Senha" onBlur="if(this.value=='')this.value='Senha'" onFocus="if(this.value=='Senha')this.value='1234' "> 
+			<input type="submit" value="Login" id="logar" >
+
+	</div>
+
+
+	<div class="chat chat-main" style="display:none;">
+		<div class="menu">
+  
+			<div class="back">
+				<i class="fa fa-chevron-left"></i> 
+				<img src="http://i.imgur.com/DY6gND0.png" draggable="false"/>
+			</div>
+			  
+			<div class="name">Grupo</div>
+			  
+			<div class="last">pode falar a vontade...</div>
+			  
+			</div>
+			<ol class="chat" id="core">
+
+			<!--<div class="day">Hoy</div>-->
+			</ol>
+			<input class="textarea" type="text" placeholder="Type here!"/><div class="emojis" id="send">
+		</div>
+	</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script type="text/javascript">
+
+var name = '', message = '', color = '';
+
+var chat = $("#core");
+var usuarios = $(".usuarios .lista");
+
+var socket = io('ws://192.168.15.5:3000');
+
+$("#logar").click(() => {
+	name = $("#name").val();
+
+	$("#login").hide("slow");
+	$("body").css("background-color", "#e5e5e5");
+	$(".chat").show();
+
+	init();
+});
+
+$("#send").click(() => {
+	let msg = $(".textarea").val();
+
+	$(".textarea").val("")
+
+	sendMessage(msg);
+});
+
+socket.on('color', (data) => {
+	color = data.color;
+});
+
+socket.on('message', (data) => {
+	receiveMessage(data);
+});
+
+socket.on('new user', (data) => {
+	addUser(data);
+});
+
+socket.on('remove user', (data) => {
+	removeUser(data);
+});
+
+function init() {
+	socket.emit('new user', { username: name });
+}
+
+function sendMessage(message) {
+	if($.trim(message) != "") {
+		chat.append(`<li class="self">
+				            <div class="avatar"><span>${name.charAt(0).toUpperCase()}</span></div>
+				            <div class="msg">
+					            <p>${message}</p>
+					            <time>20:18</time>
+				            </div>
+				      </li>`);
+		socket.emit('message', { username: name, message: message, color: color });
+	}
+}
+
+function receiveMessage(data) {
+	chat.append(`<li class="other">
+			            <div class="avatar"><span style="color:${data.color}">${(data.username).charAt(0).toUpperCase()}</span></div>
+			            <div class="msg">
+				            <p>${data.message}</p>
+				            <time>20:17</time>
+			            </div>
+			      </li>`);
+}
+
+function addUser(data) {
+	usuarios.append(`<div class="usuarios" data-id="${data.id}">${data.username}</div>`);
+}
+
+function removeUser(data) {
+	$(`[data-id="${data.id}"]`).remove();
+}
+
+</script>
+</body>
+</html>
