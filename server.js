@@ -53,9 +53,9 @@ io.on('connection', function(socket){
 });
 
 
-let port = process.env.PORT;
+var port = process.env.PORT;
 if (port == null || port == "") {
-  port = 8080;
+  port = 8000;
 }
 
 server.listen(port, function(){
