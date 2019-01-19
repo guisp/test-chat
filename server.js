@@ -52,6 +52,12 @@ io.on('connection', function(socket){
 	});
 });
 
-server.listen(3000, function(){
+
+let port = process.env.PORT;
+if (port == null || port == "") {
+  port = 8080;
+}
+
+server.listen(port, function(){
 	console.log("Conectou!");
 });

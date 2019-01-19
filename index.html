@@ -43,7 +43,7 @@ var name = '', message = '', color = '';
 var chat = $("#core");
 var usuarios = $(".usuarios .lista");
 
-var socket = io('ws://192.168.15.5:3000');
+var socket = io('ws:' + (window.location.origin).replace(window.location.protocol, '') + ':8080');
 
 $("#logar").click(() => {
 	name = $("#name").val();
