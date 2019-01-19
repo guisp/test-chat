@@ -43,7 +43,7 @@ var name = '', message = '', color = '';
 var chat = $("#core");
 var usuarios = $(".usuarios .lista");
 
-var socket = io(window.location.origin + ':8000');
+var socket = io.connect(window.location.origin);
 
 $("#logar").click(() => {
 	name = $("#name").val();
@@ -70,7 +70,9 @@ socket.on('color', (data) => {
 socket.on('message', (data) => {
 	receiveMessage(data);
 });
-
+socket.on('teste', (data) => {
+	console.log(data);
+});
 socket.on('new user', (data) => {
 	addUser(data);
 });
@@ -91,7 +93,8 @@ function sendMessage(message) {
 					            <p>${message}</p>
 					            <time>20:18</time>
 				            </div>
-				      </li>`);
+					  </li>`);
+					  console.log('mandou');
 		socket.emit('message', { username: name, message: message, color: color });
 	}
 }

@@ -14,8 +14,9 @@ app.get("/", function(req, res) {
 
 io.on('connection', function(socket){ 
 	var users = "";
-	
+	console.log('novo usuario');
 	var allClients = [];	
+	io.emit('teste', { message: 'be received by everyone'});
 
 	socket.on('new user', (data) => {
 		++numUsers;
@@ -35,7 +36,7 @@ io.on('connection', function(socket){
 		socket.broadcast.emit("new user", {username: data.username, id: id, color: color});
 	});
 
-	socket.on('message', (data) => {
+	socket.on('message', function(data) {
 		console.log('mensagem');
 
 		socket.broadcast.emit("message", data);
@@ -58,7 +59,7 @@ io.on('connection', function(socket){
 
 var port = process.env.PORT;
 if (port == null || port == "") {
-  port = 8000;
+  port = 80;
 }
 
 server.listen(port, function(){
