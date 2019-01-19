@@ -47,9 +47,11 @@
                 'Itália',
             ]
         },
-        enviar: function (event) {
-            let alternativa = $(event.target).find('b').html();
-            socket.emit('resposta', { user: '', alternativa: alternativa });
+        methods: {
+            enviar: function (event) {
+                let alternativa = $(event.target).find('b').html();
+                socket.emit('resposta', { user: '', alternativa: alternativa });
+            }
         }
     });
 
