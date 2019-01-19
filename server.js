@@ -42,6 +42,10 @@ io.on('connection', function(socket){
 		socket.broadcast.emit("message", data);
 	});	
 
+	socket.on('resposta', function(data) {
+		socket.broadcast.emit("nova-resposta", data);
+	});	
+
 	socket.on('disconnect', function() {
 		--numUsers;
 		console.log('saiu');

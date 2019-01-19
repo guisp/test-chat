@@ -10,11 +10,30 @@
     <div class="pergunta">
         <h2>De onde é a invenção do chuveiro elétrico?</h2>
         <div class="alternativas" v-for="(alternativa, index) in alternativas">
-            <div class="alternativa"><b>{{ alfabeto[index] }}</b>. {{ alternativa }}</div>
+            <div class="alternativa" v-on:click="enviar"><b>{{ alfabeto[index] }}</b>. {{ alternativa }}</div>
         </div>
+        <p id="quem-respondeu"></p>
     </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script
+        src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
+        crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script>
+    function makeid() {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for (var i = 0; i < 5; i++)
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
+    }
+
+    var user = makeid();
+    var socket = io.connect(window.location.origin);
+
     var alfabeto = ['A','B','C','D','E','F','G'];
     var app = new Vue({
         el: '.pergunta',
@@ -27,8 +46,16 @@
                 'Austrália',
                 'Itália',
             ]
+        },
+        enviar: function (event) {
+            let alternativa = $(event.target).find('b').html();
+            socket.emit('resposta', { user: '', alternativa: alternativa });
         }
-    })
+    });
+
+    socket.on('nova-resposta', function(data) {
+        $('#quem-respondeu').append(`<span>${data.nome} respondeu ${data.alternativa}</span>`);
+    });
     </script>
 </body>
 </html>
