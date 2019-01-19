@@ -19,7 +19,7 @@ io.on('connection', function(socket){
 
 	socket.on('new user', (data) => {
 		++numUsers;
-
+		console.log('novo usuário');
 		var id = (Date.now() + "").substring(6) + "-" + Math.round((Math.random() * 100));
 
 		var color = '#' + ("000000" + Math.random().toString(16).slice(2, 8).toUpperCase()).slice(-6);
@@ -36,11 +36,14 @@ io.on('connection', function(socket){
 	});
 
 	socket.on('message', (data) => {
+		console.log('mensagem');
+
 		socket.broadcast.emit("message", data);
 	});	
 
 	socket.on('disconnect', function() {
 		--numUsers;
+		console.log('saiu');
 
 		var i = allClients.indexOf(socket);
 		allClients.splice(i, 1);
