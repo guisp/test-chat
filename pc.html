@@ -55,13 +55,13 @@
         methods: {
             enviar: function (event) {
                 let alternativa = $(event.target).find('b').html();
-                socket.emit('resposta', { user: '', alternativa: alternativa });
+                socket.emit('resposta', { user: user, alternativa: alternativa });
             }
         }
     });
 
     socket.on('nova-resposta', function(data) {
-        $('#quem-respondeu').append(`<span>${data.nome} respondeu ${data.alternativa}</span><br/>`);
+        $('#quem-respondeu').append(`<span>${data.user} respondeu ${data.alternativa}</span><br/>`);
     });
     </script>
 </body>
