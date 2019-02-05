@@ -63,6 +63,10 @@
     socket.on('nova-resposta', function(data) {
         $('#quem-respondeu').append(`<span>${data.user} respondeu ${data.alternativa}</span><br/>`);
     });
+
+    socket.on('end-question', function(data) {
+        $('#quem-respondeu').append(`<span>Todos responderam<br/>`);
+    });
     </script>
 </body>
 </html>

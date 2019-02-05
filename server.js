@@ -13,7 +13,7 @@ app.get("/", function(req, res) {
 });
 
 io.on('connection', function(socket){ 
-	var users = "";
+	var users = "", allAnswered = false, qtdAnswred = 0, answeredUsers = [];
 	console.log('novo usuario');
 	var allClients = [];	
 	io.emit('teste', { message: 'be received by everyone'});
@@ -43,7 +43,11 @@ io.on('connection', function(socket){
 	});	
 
 	socket.on('resposta', function(data) {
-		socket.broadcast.emit("nova-resposta", data);
+		if(checkAnswer(data)) {
+			socket.broadcast.emit("nova-resposta", data);
+
+			checkAllAnswered();
+		}
 	});	
 
 	socket.on('disconnect', function() {
@@ -58,6 +62,24 @@ io.on('connection', function(socket){
         	id: socket.userId
        });
 	});
+
+	function checkAnswer(data) {
+		if(answeredUsers.indexOf(data.user) !== -1) {
+			answeredUsers.push(data.user);
+			
+			++qtdAnswred;
+			
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	function checkAllAnswered() {
+		if(numUsers <= qtdAnswred) {
+			socket.broadcast.emit('end-question');
+		}
+	}
 });
 
 
