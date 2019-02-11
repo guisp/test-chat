@@ -16,7 +16,7 @@
         <p></p>
     </div>
     <div class="pergunta">
-        <h2>De onde é a invenção do chuveiro elétrico?</h2>
+        <h2>{{ pergunta }}</h2>
         <div class="alternativas" v-for="(alternativa, index) in alternativas">
             <div class="alternativa" v-on:click="enviar"><b>{{ alfabeto[index] }}</b>. {{ alternativa }}</div>
         </div>
@@ -43,17 +43,12 @@
     var socket = io.connect(window.location.origin);
 
     var alfabeto = ['A','B','C','D','E','F','G'];
-    var app = new Vue({
+    var pergunta = new Vue({
         el: '.pergunta',
         data: {
+            pergunta: '',
             alfabeto: alfabeto,
-            alternativas: [
-                'França',
-                'Inglaterra',
-                'Brasil',
-                'Austrália',
-                'Itália',
-            ]
+            alternativas: []
         },
         methods: {
             enviar: function (event) {
@@ -69,12 +64,29 @@
 
     socket.on('end-question', function(data) {
         $('#quem-respondeu').append(`<span>Todos responderam<br/>`);
+        $('.pergunta').hide();
+    });
+
+    socket.on('new-question', function(data) {
+        pergunta.pergunta = data.pergunta;
+        pergunta.alternativas = data.alternativas;
+
+        $('.pergunta').show();
     });
 
     socket.on('new-user', function(data) {
         console.log('nu', data);
-        $('$status p').text(data.totalUsers + ' Usuários');
+        $('#status p').text(data.totalUsers + ' Usuários');
+    });
+
+    socket.on('end-game', function(data) {
+        $('#status p').text('Acabou tudo!');
     });
     </script>
+<!--
+
+    De quem é a famosa frase “Penso, logo existo”?
+-->
+
 </body>
 </html>
