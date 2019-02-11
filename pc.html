@@ -12,6 +12,9 @@
     </style>
 </head>
 <body id="body">
+    <div id="status" style="float:right;">
+        <p></p>
+    </div>
     <div class="pergunta">
         <h2>De onde é a invenção do chuveiro elétrico?</h2>
         <div class="alternativas" v-for="(alternativa, index) in alternativas">
@@ -66,6 +69,11 @@
 
     socket.on('end-question', function(data) {
         $('#quem-respondeu').append(`<span>Todos responderam<br/>`);
+    });
+
+    socket.on('new-user', function(data) {
+        console.log('nu', data);
+        $('$status p').text(data.totalUsers + ' Usuários');
     });
     </script>
 </body>

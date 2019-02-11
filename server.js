@@ -18,7 +18,7 @@ io.on('connection', function(socket){
 	var allClients = [];	
 	io.emit('teste', { message: 'be received by everyone'});
 
-	socket.on('new user', (data) => {
+	socket.on('new-user', (data) => {
 		++numUsers;
 		console.log('novo usuário');
 		var id = (Date.now() + "").substring(6) + "-" + Math.round((Math.random() * 100));
@@ -33,7 +33,7 @@ io.on('connection', function(socket){
 
 		socket.emit("color", { color: color });
 		
-		socket.broadcast.emit("new user", {username: data.username, id: id, color: color});
+		socket.broadcast.emit("new-user", {username: data.username, id: id, color: color, totalUsers: numUsers});
 	});
 
 	socket.on('message', function(data) {
@@ -52,6 +52,7 @@ io.on('connection', function(socket){
 
 	socket.on('disconnect', function() {
 		--numUsers;
+		
 		console.log('saiu');
 
 		var i = allClients.indexOf(socket);
