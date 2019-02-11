@@ -18,14 +18,14 @@ io.on('connection', function(socket){
 	var allClients = [];	
 	io.emit('teste', { message: 'be received by everyone'});
 
-	socket.on('new-user', (data) => {
+	//socket.on('new-user', (data) => {
 		++numUsers;
-		console.log('novo usuário');
+		//console.log('novo usuário');
 		var id = (Date.now() + "").substring(6) + "-" + Math.round((Math.random() * 100));
 
 		var color = '#' + ("000000" + Math.random().toString(16).slice(2, 8).toUpperCase()).slice(-6);
 
-		socket.username = data.username;
+		socket.username = '';
 		socket.userId = id;
 		socket.userColor = color;
 
@@ -33,8 +33,8 @@ io.on('connection', function(socket){
 
 		socket.emit("color", { color: color });
 		
-		socket.broadcast.emit("new-user", {username: data.username, id: id, color: color, totalUsers: numUsers});
-	});
+		socket.broadcast.emit("new-user", {username: '', id: id, color: color, totalUsers: numUsers});
+	//});
 
 	socket.on('message', function(data) {
 		console.log('mensagem');
