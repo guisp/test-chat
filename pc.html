@@ -14,6 +14,20 @@
 <body id="body">
     <div id="status" style="float:right;">
         <p></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Acertos</th>
+                </tr>
+            </thead>
+            <tbody v-for="(user, index) in users">
+                <tr>
+                    <td v-bind:style="{ color: user.userColor }">{{ user.userId }}</td>
+                    <td>0</td>
+                </tr>
+            </tbody>            
+        </table>
     </div>
     <div class="pergunta">
         <h2>{{ pergunta }}</h2>
@@ -39,8 +53,17 @@
         return text;
     }
 
-    var user = makeid();
-    var socket = io.connect(window.location.origin);
+
+    if(     
+            window.localStorage.getItem("userId") === undefined || 
+            window.localStorage.getItem("userId") === '' ||
+            window.localStorage.getItem("userId") === null
+        )
+        window.localStorage.setItem("userId", makeid());
+
+    var user = window.localStorage.getItem("userId");
+
+    var socket = io.connect(window.location.origin, { query: 'userId=' + user });
 
     var alfabeto = ['A','B','C','D','E','F','G'];
     var pergunta = new Vue({
@@ -55,6 +78,13 @@
                 let alternativa = $(event.target).find('b').html();
                 socket.emit('resposta', { user: user, alternativa: alternativa });
             }
+        }
+    });
+
+    var usuarios = new Vue({
+        el: '#status table',
+        data: {
+            users: []
         }
     });
 
@@ -75,8 +105,9 @@
     });
 
     socket.on('new-user', function(data) {
-        console.log('nu', data);
         $('#status p').text(data.totalUsers + ' Usuários');
+
+        usuarios.users = data.clients;
     });
 
     socket.on('end-game', function(data) {

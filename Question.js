@@ -11,7 +11,7 @@ module.exports = class Question {
                     'Austrália',
                     'Itália'
                 ],
-                'answer': 3
+                'answer': 2
             },
             {
                 'question': 'De quem é a famosa frase "Penso, logo existo"?',
@@ -23,6 +23,17 @@ module.exports = class Question {
                     'Francis Bacon'
                 ],
                 'answer': 2
+            },
+            {
+                'question': 'Quem pintou "Guernica"?',
+                'alternatives' : [
+                    'Paul Cézanne',
+                    'Pablo Picasso',
+                    'Diego Rivera',
+                    'Tarsila do Amaral',
+                    'Salvador Dalí'
+                ],
+                'answer': 1
             },
         ];
 

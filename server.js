@@ -7,7 +7,7 @@ var Question= require('./Question');
 
 var numUsers = 0;
 
-var allClients = [];	
+var allClients = [], clientsReadable = [];	
 var users = "", allAnswered = false, qtdAnswred = 0, answeredUsers = [];
 
 var question;
@@ -27,7 +27,7 @@ io.on('connection', function(socket){
 	
 	++numUsers;
 	
-	var id = (Date.now() + "").substring(6) + "-" + Math.round((Math.random() * 100));
+	var id = socket.handshake.query['userId'];
 
 	var color = '#' + ("000000" + Math.random().toString(16).slice(2, 8).toUpperCase()).slice(-6);
 
@@ -36,10 +36,13 @@ io.on('connection', function(socket){
 	socket.userColor = color;
 
 	allClients.push(socket);
-
-	socket.emit("color", { color: color });
 	
-	io.emit("new-user", {username: '', id: id, color: color, totalUsers: numUsers});
+	clientsReadable.push({
+		'userId': id,
+		'userColor': color
+	});
+
+	io.emit("new-user", {username: '', id: id, color: color, totalUsers: numUsers, clients: clientsReadable});
 
 	socket.emit('new-question', {
 		pergunta: question.pergunta,
@@ -56,7 +59,9 @@ io.on('connection', function(socket){
 	socket.on('resposta', function(data) {
 		if(checkAnswer(data)) {
 			socket.broadcast.emit("nova-resposta", data);
-
+			if(data.alternativa == question.resposta) {
+				// Continuar aqui fazendo saber a resposta para o ranking
+			}
 			checkAllAnswered();
 		}
 	});	
@@ -65,6 +70,10 @@ io.on('connection', function(socket){
 		--numUsers;
 		
 		console.log('saiu');
+
+		clientsReadable = clientsReadable.filter(function(actual, index, arr){
+			return actual.userId !== socket.userId;		
+		});
 
 		var i = allClients.indexOf(socket);
 		allClients.splice(i, 1);
