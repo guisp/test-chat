@@ -47,7 +47,21 @@ io.on('connection', function(socket){
 	socket.emit('new-question', {
 		pergunta: question.pergunta,
 		alternativas: question.alternativas,
-		resposta: question.resposta
+		resposta: question.resposta,
+		clients: clientsReadable
+	});
+
+	socket.on('change-user', function(data){
+
+		clientsReadable[data.newUser] = clientsReadable[socket.userId];
+
+		delete clientsReadable[socket.userId];
+
+		socket.userId = data.newUser;
+		clientsReadable[data.newUser].userId = data.newUser;
+
+		io.emit("changed-user", {totalUsers: numUsers, clients: clientsReadable});
+
 	});
 
 	socket.on('message', function(data) {
@@ -59,8 +73,10 @@ io.on('connection', function(socket){
 	socket.on('resposta', function(data) {
 		if(checkAnswer(data)) {
 			socket.broadcast.emit("nova-resposta", data);
-			if(data.alternativa == question.resposta) {
-				// Continuar aqui fazendo saber a resposta para o ranking
+			
+			if(data.alternativa === question.resposta) {
+				let score = clientsReadable[data.user].hint;
+				clientsReadable[data.user].hint = score === undefined ? 1 : ++score;
 			}
 			checkAllAnswered();
 		}
@@ -71,7 +87,7 @@ io.on('connection', function(socket){
 		
 		console.log('saiu');
 
-		delete clientsReadable[socket.userId];
+		//delete clientsReadable[socket.userId];
 
 		var i = allClients.indexOf(socket);
 		allClients.splice(i, 1);
@@ -83,13 +99,11 @@ io.on('connection', function(socket){
 	});
 
 	function checkAnswer(data) {
-		console.log('before', answeredUsers);
 		if(answeredUsers.indexOf(data.user) === -1) {
 			answeredUsers.push(data.user);
-		console.log('after', answeredUsers);
 			
 			++qtdAnswred;
-			
+						
 			return true;
 		} else {
 			return false;
@@ -111,11 +125,12 @@ io.on('connection', function(socket){
 			io.emit('new-question', {
 				pergunta: question.pergunta,
 				alternativas: question.alternativas,
-				resposta: question.resposta
+				resposta: question.resposta,
+				clients: clientsReadable
 			});
 		} else {
 			startGame();
-			io.emit('end-game');
+			io.emit('end-game', { clients: clientsReadable });
 		}
 	}
 	

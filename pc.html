@@ -6,12 +6,26 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>PC</title>
     <style>
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
         .alternativa {
             cursor: pointer;
+        }
+        .init {
+            width: 100%;
+            height: 100%;
         }
     </style>
 </head>
 <body id="body">
+    <div class="init">
+        <label for="name">Digite seu usuário</label><br/>
+        <input type="text" name="name" id="name" /><br/>
+        <button id="changeUsername">Mudar</button>
+        <button>Continuar</button>
+    </div>
     <div id="status" style="float:right;">
         <p></p>
         <table>
@@ -24,7 +38,7 @@
             <tbody v-for="(user, index) in users">
                 <tr>
                     <td v-bind:style="{ color: user.userColor }">{{ user.userId }}</td>
-                    <td>0</td>
+                    <td>{{ user.hint || 0 }}</td>
                 </tr>
             </tbody>            
         </table>
@@ -32,7 +46,7 @@
     <div class="pergunta">
         <h2>{{ pergunta }}</h2>
         <div class="alternativas" v-for="(alternativa, index) in alternativas">
-            <div class="alternativa" v-on:click="enviar"><b>{{ alfabeto[index] }}</b>. {{ alternativa }}</div>
+            <div class="alternativa" v-on:click="enviar(index)"><b>{{ alfabeto[index] }}</b>. {{ alternativa }}</div>
         </div>
         <p id="quem-respondeu"></p>
     </div>
@@ -63,6 +77,8 @@
 
     var user = window.localStorage.getItem("userId");
 
+    $('#name').val(user);
+
     var socket = io.connect(window.location.origin, { query: 'userId=' + user });
 
     var alfabeto = ['A','B','C','D','E','F','G'];
@@ -74,8 +90,8 @@
             alternativas: []
         },
         methods: {
-            enviar: function (event) {
-                let alternativa = $(event.target).find('b').html();
+            enviar: function (index, event) {
+                let alternativa = index;
                 socket.emit('resposta', { user: user, alternativa: alternativa });
             }
         }
@@ -89,7 +105,7 @@
     });
 
     socket.on('nova-resposta', function(data) {
-        $('#quem-respondeu').append(`<span>${data.user} respondeu ${data.alternativa}</span><br/>`);
+        //$('#quem-respondeu').append(`<span>${data.user} respondeu ${data.alternativa}</span><br/>`);
     });
 
     socket.on('end-question', function(data) {
@@ -100,6 +116,7 @@
     socket.on('new-question', function(data) {
         pergunta.pergunta = data.pergunta;
         pergunta.alternativas = data.alternativas;
+        usuarios.users = data.clients;
 
         $('.pergunta').show();
     });
@@ -110,8 +127,30 @@
         usuarios.users = data.clients;
     });
 
+    socket.on('changed-user', function(data) {
+        $('#status p').text(data.totalUsers + ' Usuários');
+
+        usuarios.users = data.clients;
+    });
+
     socket.on('end-game', function(data) {
         $('#status p').text('Acabou tudo!');
+
+        usuarios.users = data.clients;
+
+    });
+
+    $('#changeUsername').click(function(){
+        let oldUser = user,
+            newUser = $('#name').val();
+
+        window.localStorage.setItem("userId", newUser);
+            
+        socket.emit('change-user', { oldUser: oldUser, newUser: newUser });
+    });
+
+    $('.init button').click(function(){
+        $(this).parents('.init').hide();
     });
     </script>
 <!--
