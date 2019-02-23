@@ -7,7 +7,7 @@ var Question= require('./Question');
 
 var numUsers = 0;
 
-var allClients = [], clientsReadable = {};	
+var allClients = [], clientsReadable = {}, usersOut = {};	
 var users = "", allAnswered = false, qtdAnswred = 0, answeredUsers = [];
 
 var question;
@@ -45,9 +45,8 @@ io.on('connection', function(socket){
 
 	allClients.push(socket);
 	
-	if(clientsReadable[id] !== undefined) {
-		clientsReadable[id].userId = id;
-		clientsReadable[id].userColor = color;
+	if(usersOut[id] !== undefined) {
+		clientsReadable[id] = usersOut[id];
 	} else {
 		clientsReadable[id] = {
 			'userId': id,
@@ -104,7 +103,8 @@ io.on('connection', function(socket){
 		
 		console.log('saiu');
 
-		//delete clientsReadable[socket.userId];
+		usersOut[socket.userId] = clientsReadable[socket.userId];
+		delete clientsReadable[socket.userId];
 
 		var i = allClients.indexOf(socket);
 		allClients.splice(i, 1);
