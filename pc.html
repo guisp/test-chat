@@ -23,8 +23,9 @@
     <div class="init">
         <label for="name">Digite seu usuário</label><br/>
         <input type="text" name="name" id="name" /><br/>
-        <button id="changeUsername">Mudar</button>
-        <button>Continuar</button>
+        <button id="reiniciarJogo">Zerar e reiniciar jogo</button>
+        <button id="changeUsername">Mudar nome</button>
+        <button>Continuar com nome</button>
     </div>
     <div id="status" style="float:right;">
         <p></p>
@@ -143,10 +144,14 @@
     $('#changeUsername').click(function(){
         let oldUser = user,
             newUser = $('#name').val();
-
+console.log('chamou'); 
         window.localStorage.setItem("userId", newUser);
             
         socket.emit('change-user', { oldUser: oldUser, newUser: newUser });
+    });
+
+    $('#reiniciarJogo').click(function(){
+        socket.emit('init-server');
     });
 
     $('.init button').click(function(){

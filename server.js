@@ -12,6 +12,7 @@ var users = "", allAnswered = false, qtdAnswred = 0, answeredUsers = [];
 
 var question;
 
+
 app.use(express.static(__dirname + '/'));
 
 app.get("/", function(req, res) {
@@ -19,10 +20,17 @@ app.get("/", function(req, res) {
 });
 
 io.on('connection', function(socket){ 
-	console.log('novo usuario');
 
 	socket.on('init-server', function(data){
 		startGame();
+		question.pergunta = 0;
+
+		io.emit('new-question', {
+			pergunta: question.pergunta,
+			alternativas: question.alternativas,
+			resposta: question.resposta,
+			clients: clientsReadable
+		});
 	});
 	
 	++numUsers;
@@ -37,10 +45,15 @@ io.on('connection', function(socket){
 
 	allClients.push(socket);
 	
-	clientsReadable[id] = {
-		'userId': id,
-		'userColor': color
-	};
+	if(clientsReadable[id] !== undefined) {
+		clientsReadable[id].userId = id;
+		clientsReadable[id].userColor = color;
+	} else {
+		clientsReadable[id] = {
+			'userId': id,
+			'userColor': color
+		};
+	}
 	
 	io.emit("new-user", {username: '', id: id, color: color, totalUsers: numUsers, clients: clientsReadable});
 
@@ -52,16 +65,19 @@ io.on('connection', function(socket){
 	});
 
 	socket.on('change-user', function(data){
+		
+		if(data.newUser == undefined) return false;
 
-		clientsReadable[data.newUser] = clientsReadable[socket.userId];
-
+		let oldInfo = clientsReadable[socket.userId];
+		
 		delete clientsReadable[socket.userId];
 
 		socket.userId = data.newUser;
+		clientsReadable[data.newUser] = oldInfo;
 		clientsReadable[data.newUser].userId = data.newUser;
 
 		io.emit("changed-user", {totalUsers: numUsers, clients: clientsReadable});
-
+ 
 	});
 
 	socket.on('message', function(data) {
@@ -75,6 +91,7 @@ io.on('connection', function(socket){
 			socket.broadcast.emit("nova-resposta", data);
 			
 			if(data.alternativa === question.resposta) {
+				console.log(data.user);
 				let score = clientsReadable[data.user].hint;
 				clientsReadable[data.user].hint = score === undefined ? 1 : ++score;
 			}
@@ -137,7 +154,12 @@ io.on('connection', function(socket){
 });
 
 function startGame() {
+	
 	question = new Question();
+	
+	for(let i = 0, j = Object.keys(clientsReadable).length; i < j; i++) {
+		clientsReadable[Object.keys(clientsReadable)[i]].hint = 0;
+	}
 }
 
 startGame();
