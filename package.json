@@ -13,7 +13,7 @@
     "start": "node server.js"
   },
   "engines": {
-    "node": "7.1.1"
+    "node": "6.11.1"
   },
   "author": "Guilherme",
   "license": "ISC"
