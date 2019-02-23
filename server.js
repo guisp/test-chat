@@ -47,6 +47,7 @@ io.on('connection', function(socket){
 	
 	if(usersOut[id] !== undefined) {
 		clientsReadable[id] = usersOut[id];
+		delete usersOut[id];
 	} else {
 		clientsReadable[id] = {
 			'userId': id,
