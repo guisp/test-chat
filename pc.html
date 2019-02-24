@@ -94,6 +94,7 @@
             enviar: function (index, event) {
                 let alternativa = index;
                 socket.emit('resposta', { user: user, alternativa: alternativa });
+                $('.alternativas').hide();
             }
         }
     });
@@ -120,6 +121,7 @@
         usuarios.users = data.clients;
 
         $('.pergunta').show();
+        $('.alternativas').show();
     });
 
     socket.on('new-user', function(data) {

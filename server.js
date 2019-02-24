@@ -147,8 +147,10 @@ io.on('connection', function(socket){
 				clients: clientsReadable
 			});
 		} else {
-			startGame();
+			
 			io.emit('end-game', { clients: clientsReadable });
+      startGame();
+      
 		}
 	}
 	
