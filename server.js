@@ -55,6 +55,8 @@ io.on('connection', function(socket){
 		};
 	}
 	
+	console.log(clientsReadable, numUsers);
+
 	io.emit("new-user", {username: '', id: id, color: color, totalUsers: numUsers, clients: clientsReadable});
 
 	socket.emit('new-question', {
@@ -102,7 +104,7 @@ io.on('connection', function(socket){
 	});	
 
 	socket.on('disconnect', function() {
-		--numUsers;
+		numUsers--;
 		
 		console.log('saiu');
 
