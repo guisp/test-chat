@@ -93,8 +93,6 @@ io.on('connection', function(socket){
 			if(data.alternativa === question.resposta) {
 				console.log(data.user); 
 				if(clientsReadable[data.user] !== undefined) {
-
-				} else {
 					let score = clientsReadable[data.user].hint;
 					clientsReadable[data.user].hint = score === undefined ? 1 : ++score;
 				}
