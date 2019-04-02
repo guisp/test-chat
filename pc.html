@@ -76,7 +76,7 @@
         )
         window.localStorage.setItem("userId", makeid());
 
-    var user = window.localStorage.getItem("userId");
+    window.user = window.localStorage.getItem("userId");
 
     $('#name').val(user);
 
@@ -93,7 +93,8 @@
         methods: {
             enviar: function (index, event) {
                 let alternativa = index;
-                socket.emit('resposta', { user: user, alternativa: alternativa });
+                
+                socket.emit('resposta', { user: window.user, alternativa: alternativa });
                 $('.alternativas').hide();
             }
         }
@@ -144,11 +145,11 @@
     });
 
     $('#changeUsername').click(function(){
-        let oldUser = user,
+        let oldUser = window.user,
             newUser = $('#name').val();
         // console.log('chamou'); 
         window.localStorage.setItem("userId", newUser);
-        user = newUser;
+        window.user = newUser;
         socket.emit('change-user', { oldUser: oldUser, newUser: newUser });
     });
 
