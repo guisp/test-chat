@@ -91,7 +91,7 @@ io.on('connection', function(socket){
 			socket.broadcast.emit("nova-resposta", data);
 			
 			if(data.alternativa === question.resposta) {
-				console.log(data.user);
+				console.log(data.user); 
 				let score = clientsReadable[data.user].hint;
 				clientsReadable[data.user].hint = score === undefined ? 1 : ++score;
 			}

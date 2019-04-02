@@ -146,9 +146,9 @@
     $('#changeUsername').click(function(){
         let oldUser = user,
             newUser = $('#name').val();
-console.log('chamou'); 
+        // console.log('chamou'); 
         window.localStorage.setItem("userId", newUser);
-            
+        user = newUser;
         socket.emit('change-user', { oldUser: oldUser, newUser: newUser });
     });
 
